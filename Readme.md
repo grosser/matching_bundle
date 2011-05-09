@@ -21,6 +21,7 @@ If you need sudo to install gems do something like:
 TODO
 ====
  - parse --gemfile option
+ - use highest matching version
 
 Author
 ======
