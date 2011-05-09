@@ -22,6 +22,7 @@ TODO
 ====
  - parse --gemfile option
  - use highest matching version
+ - add a --no-install flag so only local versions are used
 
 Author
 ======
