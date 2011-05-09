@@ -15,6 +15,7 @@ If there is a specific bundler version locked in the gemfile it will be used.
     ...
 
 If you need sudo to install gems do something like:
+
     sudo matching_bundle --version # matching version is installed
     matching_bundle install        # matching version is used
 
