@@ -5,12 +5,26 @@
 
 Gem::Specification.new do |s|
   s.name = %q{matching_bundle}
-  s.version = "0.0.0"
+  s.version = "0.1.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Michael Grosser"]
   s.date = %q{2011-05-09}
+  s.default_executable = %q{matching_bundle}
   s.email = %q{michael@grosser.it}
+  s.executables = ["matching_bundle"]
+  s.files = [
+    "Gemfile",
+    "Gemfile.lock",
+    "Rakefile",
+    "Readme.md",
+    "VERSION",
+    "bin/matching_bundle",
+    "lib/matching_bundle.rb",
+    "matching_bundle.gemspec",
+    "spec/matching_bundle_spec.rb",
+    "spec/spec_helper.rb"
+  ]
   s.homepage = %q{http://github.com/grosser/matching_bundle}
   s.require_paths = ["lib"]
   s.rubygems_version = %q{1.6.2}
