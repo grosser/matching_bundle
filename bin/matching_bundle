@@ -1,0 +1,13 @@
+#!/usr/bin/env ruby
+if File.exist?('Gemfile.lock')
+  content = File.read('Gemfile.lock')
+  $LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
+  require 'rubygems'
+  require 'matching_bundle'
+  if version = MatchingBundle.find_or_install_matching_version(content)
+    $stderr.puts "using bunlder #{version}"
+    exec "bundle _#{version}_ #{ARGV * " "}" # program exits here ...
+  end
+end
+
+exec "bundle #{ARGV * " "}"
