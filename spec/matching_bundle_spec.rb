@@ -25,4 +25,24 @@ describe MatchingBundle do
       MatchingBundle.installed_bundler_versions.should =~ expected
     end
   end
+
+  describe :find_matching_local_bundler_version do
+    it "find something for >=0" do
+      MatchingBundle.find_matching_local_bundler_version('>=0').should =~ /^\d+\.\d+\.\d+$/
+    end
+
+    it "finds nothing for >999" do
+      MatchingBundle.find_matching_local_bundler_version('>=999').should == nil
+    end
+  end
+
+  describe :find_matching_remote_bundler_version do
+    it "finds one for ~>0.4.0" do
+      MatchingBundle.find_matching_remote_bundler_version("~>0.4.0").should == "0.4.1"
+    end
+
+    it "does not find one for ~>999" do
+      MatchingBundle.find_matching_remote_bundler_version("~>999.0.0").should == nil
+    end
+  end
 end

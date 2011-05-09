@@ -1,5 +1,24 @@
+require 'open-uri'
+
 class MatchingBundle
   VERSION = File.read( File.join(File.dirname(__FILE__),'..','VERSION') ).strip
+
+  def self.find_matching_remote_bundler_version(requirement)
+    json = open('http://rubygems.org/api/v1/versions/bundler').read
+    versions = json.scan(/"number"\s*:\s*"(.*?)"/).map{|v|v.first}
+    find_satisfied(requirement, versions)
+  end
+
+  def self.find_matching_local_bundler_version(requirement)
+    find_satisfied(requirement, installed_bundler_versions)
+  end
+
+  def self.find_satisfied(requirement, versions)
+    requirement = Gem::Requirement.new(requirement)
+    versions.find do |version|
+      requirement.satisfied_by? Gem::Version.new(version)
+    end
+  end
 
   def self.installed_bundler_versions
     bundler_specs = if Gem::Specification.respond_to?(:find_all)
