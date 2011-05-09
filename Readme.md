@@ -1,4 +1,5 @@
-Find a matching bundler version for a Gemfile and use it
+Find a matching bundler version for a Gemfile and use it.
+Any additional arguments are passed to bundle, so use it just like you would use bundle.
 
 Install
 =======
@@ -6,7 +7,10 @@ Install
 
 Usage
 =====
-    CODE_EXAMPLE
+Everything works just like bundle.
+If there is a specific bundler version locked in the gemfile it will be used.
+
+    matching_bundle install
 
 Author
 ======
