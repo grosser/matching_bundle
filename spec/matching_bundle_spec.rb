@@ -6,16 +6,27 @@ describe MatchingBundle do
   end
 
   describe :bundler_requirement do
+    def requirement(*args)
+      MatchingBundle.bundler_requirement(*args)
+    end
+
     it "finds nothing when there is nothing" do
-      MatchingBundle.bundler_requirement("").should == nil
+      requirement("").should == nil
     end
 
     it "finds a direct requirement" do
-      MatchingBundle.bundler_requirement("asd\n  bundler (1.0.1)").should == "1.0.1"
+      gemfile = "asd\n  bundler (1.0.1)"
+      requirement(gemfile).should == "1.0.1"
     end
 
     it "finds a indirect requirement" do
-      MatchingBundle.bundler_requirement("asd\n    bundler (~>1.0.1)").should == "~>1.0.1"
+      gemfile = "asd\n    bundler (~>1.0.1)"
+      requirement(gemfile).should == "~>1.0.1"
+    end
+
+    it "finds dependencies before other requirements" do
+      gemfile = "asd\n    bundler (~>1.0.1)\nDEPENDENCIES\n  bundler (= 1.1.rc)"
+      requirement(gemfile).should == "= 1.1.rc"
     end
   end
 

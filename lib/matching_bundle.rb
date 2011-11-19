@@ -45,8 +45,8 @@ class MatchingBundle
   end
 
   def self.bundler_requirement(gemfile_content)
-    if found = gemfile_content.match(/^\s*bundler \((.*)\)/)
-      found[1]
-    end
+    found = gemfile_content.scan(/^\s*bundler \((.*)\)/)
+    versions = found.map(&:last)
+    versions.find{|version| version =~ /^=\s*\d/ } || versions.first
   end
 end
