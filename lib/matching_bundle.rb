@@ -5,14 +5,15 @@ require 'json'
 module MatchingBundle
   class << self
     def find_or_install_matching_version(gemfile_content)
-      return unless requirement = bundler_requirement(gemfile_content)
+      requirements = bundler_requirements(gemfile_content)
+      return if requirements.empty?
 
-      if version = find_matching_local_bundler_version(requirement)
+      if version = find_matching_local_bundler_version(requirements)
         warn "Found bundler #{version}"
         return version
       end
 
-      return unless version = find_matching_remote_bundler_version(requirement)
+      return unless version = find_matching_remote_bundler_version(requirements)
 
       warn "Installing bundler #{version}"
       abort unless system "gem", "install", "bundler", "-v", version
@@ -21,19 +22,19 @@ module MatchingBundle
 
     private
 
-    def find_matching_remote_bundler_version(requirement)
+    def find_matching_remote_bundler_version(requirements)
       json = open('https://rubygems.org/api/v1/versions/bundler.json').read
       versions = JSON.load(json).map { |v| v["number"] }
-      find_satisfied(requirement, versions)
+      find_satisfied(requirements, versions)
     end
 
-    def find_matching_local_bundler_version(requirement)
-      find_satisfied(requirement, installed_bundler_versions)
+    def find_matching_local_bundler_version(requirements)
+      find_satisfied(requirements, installed_bundler_versions)
     end
 
-    def find_satisfied(requirement, versions)
-      requirement = Gem::Requirement.new(requirement)
-      versions.find do |version|
+    def find_satisfied(requirements, versions)
+      requirement = Gem::Requirement.new(*requirements)
+      versions.reverse.find do |version|
         requirement.satisfied_by? Gem::Version.new(version)
       end
     end
@@ -44,10 +45,12 @@ module MatchingBundle
         map { |spec| spec.version.to_s }
     end
 
-    def bundler_requirement(gemfile_content)
-      found = gemfile_content.scan(/^\s*bundler \((.*)\)/)
-      versions = found.map(&:last)
-      versions.grep(/^=\s*\d/).first || versions.first
+    def bundler_requirements(gemfile_content)
+      gemfile_content.
+        split("DEPENDENCIES").last.to_s.
+        split("Current Bundler version").first.to_s.
+        scan(/^\s*bundler \((.*)\)/).flatten.
+        flat_map { |r| r.split(", ") }
     end
   end
 end

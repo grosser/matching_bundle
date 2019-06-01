@@ -56,27 +56,32 @@ describe MatchingBundle do
   end
 
   describe ".bundler_requirement" do
-    def requirement(*args)
-      MatchingBundle.send(:bundler_requirement, *args)
+    def requirements(*args)
+      MatchingBundle.send(:bundler_requirements, *args)
     end
 
     it "finds nothing when there is nothing" do
-      requirement("").must_be_nil
+      requirements("").must_equal []
     end
 
     it "finds a direct requirement" do
       gemfile = "asd\n  bundler (1.0.1)"
-      requirement(gemfile).must_equal "1.0.1"
+      requirements(gemfile).must_equal ["1.0.1"]
     end
 
     it "finds a indirect requirement" do
       gemfile = "asd\n    bundler (~>1.0.1)"
-      requirement(gemfile).must_equal "~>1.0.1"
+      requirements(gemfile).must_equal ["~>1.0.1"]
     end
 
     it "finds dependencies before other requirements" do
       gemfile = "asd\n    bundler (~>1.0.1)\nDEPENDENCIES\n  bundler (= 1.1.rc)"
-      requirement(gemfile).must_equal "= 1.1.rc"
+      requirements(gemfile).must_equal ["= 1.1.rc"]
+    end
+
+    it "finds all dependencies" do
+      gemfile = "asd\n    bundler (~>1.0.1)\nDEPENDENCIES\n  bundler (= 1.1.rc)"
+      requirements(gemfile).must_equal ["= 1.1.rc"]
     end
 
     it "can find from failed bundle lock input" do
@@ -96,7 +101,17 @@ describe MatchingBundle do
         Could not find gem 'bundler (~> 1.3)' in any of the relevant sources:
           the local ruby installation
       TXT
-      requirement(input).must_equal "~> 1.3"
+      requirements(input).must_equal ["~> 1.3"]
+    end
+  end
+
+  describe ".find_satisfied" do
+    it "finds simple" do
+      MatchingBundle.send(:find_satisfied, ['>=0'], ["1.2.3", "1.3.4"]).must_equal "1.3.4"
+    end
+
+    it "finds complex" do
+      MatchingBundle.send(:find_satisfied, ['>=0', '~>1.2.0', '<=3'], ["1.2.3", "1.3.4"]).must_equal "1.2.3"
     end
   end
 
