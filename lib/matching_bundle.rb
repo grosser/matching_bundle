@@ -8,6 +8,7 @@ module MatchingBundle
       return unless requirement = bundler_requirement(gemfile_content)
 
       if version = find_matching_local_bundler_version(requirement)
+        warn "Found bundler #{version}"
         return version
       end
 

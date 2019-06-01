@@ -24,8 +24,10 @@ describe MatchingBundle do
     end
 
     it "prefer local version when available" do
-      MatchingBundle.find_or_install_matching_version("bundler (#{Bundler::VERSION})").
-        must_equal Bundler::VERSION
+      capture_stderr do
+        MatchingBundle.find_or_install_matching_version("bundler (#{Bundler::VERSION})").
+          must_equal Bundler::VERSION
+      end.must_equal "Found bundler #{Bundler::VERSION}\n"
     end
 
     it "cannot find version that does not exist remotely" do
