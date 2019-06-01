@@ -78,6 +78,26 @@ describe MatchingBundle do
       gemfile = "asd\n    bundler (~>1.0.1)\nDEPENDENCIES\n  bundler (= 1.1.rc)"
       requirement(gemfile).must_equal "= 1.1.rc"
     end
+
+    it "can find from failed bundle lock input" do
+      input = <<-TXT.gsub(/^        /, "")
+        Fetching gem metadata from https://rubygems.org/..........
+        Fetching gem metadata from https://rubygems.org/.
+        Resolving dependencies...
+        Bundler could not find compatible versions for gem "bundler":
+          In rails3.2.gemfile:
+            bundler (~> 1.3)
+        
+          Current Bundler version:
+            bundler (2.0.1)
+        This Gemfile requires a different version of Bundler.
+        Perhaps you need to update Bundler by running `gem install bundler`?
+        
+        Could not find gem 'bundler (~> 1.3)' in any of the relevant sources:
+          the local ruby installation
+      TXT
+      requirement(input).must_equal "~> 1.3"
+    end
   end
 
   describe ".installed_bundler_versions" do

@@ -2,13 +2,22 @@
 # frozen_string_literal: true
 
 gemfile = ENV["BUNDLE_GEMFILE"] || "Gemfile"
+
+unless File.exist?(gemfile)
+  warn "#{gemfile} not found"
+  exec "bundle", *ARGV
+end
+
 lockfile = "#{gemfile}.lock"
-exec "bundle", *ARGV unless File.exist?(lockfile) # nothing we can do, regular bundle it is
+if File.exist?(lockfile)
+  content = File.read(lockfile)
+else
+  warn "Locking #{lockfile}"
+  content = `bundle lock 2>&1`
+  exec "bundle", *ARGV if $?.success?
+end
 
 require 'matching_bundle'
-
-content = File.read(lockfile)
 if version = MatchingBundle.find_or_install_matching_version(content)
-  warn "Using bundler #{version}"
   exec "bundle", "_#{version}_", *ARGV
 end

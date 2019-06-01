@@ -47,7 +47,7 @@ module MatchingBundle
     def bundler_requirement(gemfile_content)
       found = gemfile_content.scan(/^\s*bundler \((.*)\)/)
       versions = found.map(&:last)
-      versions.find { |version| version =~ /^=\s*\d/ } || versions.first
+      versions.grep(/^=\s*\d/).first || versions.first
     end
   end
 end
