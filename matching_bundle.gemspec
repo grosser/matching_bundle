@@ -9,6 +9,7 @@ Gem::Specification.new name, MatchingBundle::VERSION do |s|
   s.email = "michael@grosser.it"
   s.homepage = "https://github.com/grosser/#{name}"
   s.files = `git ls-files lib/ bin/ MIT-LICENSE`.split("\n")
+  s.executables = ["matching_bundle"]
   s.license = "MIT"
   s.required_ruby_version = ">= 2.3.0"
 end
