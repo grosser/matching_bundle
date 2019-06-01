@@ -1,19 +1,22 @@
-task :default do
-  sh "rspec spec/"
+# frozen_string_literal: true
+require "bundler/setup"
+require "bundler/gem_tasks"
+require "bump/tasks"
+
+require "yaml"
+travis = YAML.load_file(Bundler.root.join('.travis.yml'))
+  .fetch('env')
+  .map { |v| v.delete('TASK=') }
+
+task default: travis
+
+require "rake/testtask"
+Rake::TestTask.new :test do |t|
+  t.pattern = 'test/**/*_test.rb'
+  t.warning = false
 end
 
-begin
-  require 'jeweler'
-  Jeweler::Tasks.new do |gem|
-    gem.name = 'matching_bundle'
-    gem.summary = "Find a matching bundler version for a Gemfile and use it"
-    gem.email = "michael@grosser.it"
-    gem.homepage = "http://github.com/grosser/#{gem.name}"
-    gem.authors = ["Michael Grosser"]
-    gem.license = "MIT"
-  end
-
-  Jeweler::GemcutterTasks.new
-rescue LoadError
-  puts "Jeweler, or one of its dependencies, is not available. Install it with: gem install jeweler"
+desc "Run rubocop"
+task :rubocop do
+  sh "rubocop --parallel"
 end

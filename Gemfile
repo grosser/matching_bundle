@@ -1,7 +1,10 @@
-source :rubygems
+# frozen_string_literal: true
+source "https://rubygems.org"
+gemspec
 
-group :dev do # not development <-> would add unneeded development dependencies in gemspec
-  gem 'rake'
-  gem 'rspec', '~>2'
-  gem 'jeweler'
-end
+gem "bump"
+gem "rake"
+gem "maxitest"
+gem "single_cov"
+gem "rubocop"
+gem "mocha"

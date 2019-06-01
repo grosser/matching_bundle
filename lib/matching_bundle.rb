@@ -1,52 +1,52 @@
+# frozen_string_literal: true
 require 'open-uri'
+require 'json'
 
-class MatchingBundle
-  VERSION = File.read( File.join(File.dirname(__FILE__),'..','VERSION') ).strip
+module MatchingBundle
+  class << self
+    def find_or_install_matching_version(gemfile_content)
+      return unless requirement = bundler_requirement(gemfile_content)
 
-  def self.find_or_install_matching_version(gemfile_content)
-    return unless requirement = bundler_requirement(gemfile_content)
+      if version = find_matching_local_bundler_version(requirement)
+        return version
+      end
 
-    if version = find_matching_local_bundler_version(requirement)
-      return version
+      return unless version = find_matching_remote_bundler_version(requirement)
+
+      warn "Installing bundler #{version}"
+      abort unless system "gem", "install", "bundler", "-v", version
+      version
     end
 
-    if version = find_matching_remote_bundler_version(requirement)
-      $stderr.puts "installing bundler #{version}"
-      `gem install bundler -v #{version}`
-      return version
+    private
+
+    def find_matching_remote_bundler_version(requirement)
+      json = open('https://rubygems.org/api/v1/versions/bundler.json').read
+      versions = JSON.load(json).map { |v| v["number"] }
+      find_satisfied(requirement, versions)
     end
-  end
 
-  def self.find_matching_remote_bundler_version(requirement)
-    json = open('http://rubygems.org/api/v1/versions/bundler').read
-    versions = json.scan(/"number"\s*:\s*"(.*?)"/).map{|v|v.first}
-    find_satisfied(requirement, versions)
-  end
-
-  def self.find_matching_local_bundler_version(requirement)
-    find_satisfied(requirement, installed_bundler_versions)
-  end
-
-  def self.find_satisfied(requirement, versions)
-    requirement = Gem::Requirement.new(requirement)
-    versions.find do |version|
-      requirement.satisfied_by? Gem::Version.new(version)
+    def find_matching_local_bundler_version(requirement)
+      find_satisfied(requirement, installed_bundler_versions)
     end
-  end
 
-  def self.installed_bundler_versions
-    bundler_specs = if Gem::Specification.respond_to?(:find_all)
-      Gem::Specification.find_all{|s| s.name == 'bundler' }
-    else
-      dep = Gem::Dependency.new 'bundler', Gem::Requirement.default
-      Gem.source_index.search dep
+    def find_satisfied(requirement, versions)
+      requirement = Gem::Requirement.new(requirement)
+      versions.find do |version|
+        requirement.satisfied_by? Gem::Version.new(version)
+      end
     end
-    bundler_specs.map{|spec| spec.version.to_s }
-  end
 
-  def self.bundler_requirement(gemfile_content)
-    found = gemfile_content.scan(/^\s*bundler \((.*)\)/)
-    versions = found.map(&:last)
-    versions.find{|version| version =~ /^=\s*\d/ } || versions.first
+    def installed_bundler_versions
+      Gem::Specification.
+        find_all { |s| s.name == 'bundler' }.
+        map { |spec| spec.version.to_s }
+    end
+
+    def bundler_requirement(gemfile_content)
+      found = gemfile_content.scan(/^\s*bundler \((.*)\)/)
+      versions = found.map(&:last)
+      versions.find { |version| version =~ /^=\s*\d/ } || versions.first
+    end
   end
 end

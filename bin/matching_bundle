@@ -1,13 +1,14 @@
 #!/usr/bin/env ruby
-if File.exist?('Gemfile.lock')
-  content = File.read('Gemfile.lock')
-  $LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
-  require 'rubygems'
-  require 'matching_bundle'
-  if version = MatchingBundle.find_or_install_matching_version(content)
-    $stderr.puts "using bunlder #{version}"
-    exec "bundle _#{version}_ #{ARGV * " "}" # program exits here ...
-  end
-end
+# frozen_string_literal: true
 
-exec "bundle #{ARGV * " "}"
+gemfile = ENV["BUNDLE_GEMFILE"] || "Gemfile"
+lockfile = "#{gemfile}.lock"
+exec "bundle", *ARGV unless File.exist?(lockfile) # nothing we can do, regular bundle it is
+
+require 'matching_bundle'
+
+content = File.read(lockfile)
+if version = MatchingBundle.find_or_install_matching_version(content)
+  warn "Using bundler #{version}"
+  exec "bundle", "_#{version}_", *ARGV
+end
