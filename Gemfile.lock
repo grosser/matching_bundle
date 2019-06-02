@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    matching_bundle (0.3.1)
+    matching_bundle (0.3.2)
 
 GEM
   remote: https://rubygems.org/
