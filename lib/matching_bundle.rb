@@ -6,14 +6,17 @@ module MatchingBundle
   class << self
     def find_or_install_matching_version(gemfile_content)
       requirements = bundler_requirements(gemfile_content)
-      return if requirements.empty?
+      return if requirements.empty? # just use whatever
 
       if version = find_matching_local_bundler_version(requirements)
-        warn "Found bundler #{version}"
+        warn "Using installed bundler #{version}"
         return version
       end
 
-      return unless version = find_matching_remote_bundler_version(requirements)
+      unless version = find_matching_remote_bundler_version(requirements)
+        warn "No remote version of bundler satisfies #{requirements.join(", ")}"
+        return
+      end
 
       warn "Installing bundler #{version}"
       abort unless system "gem", "install", "bundler", "-v", version

@@ -27,11 +27,13 @@ describe MatchingBundle do
       capture_stderr do
         MatchingBundle.find_or_install_matching_version("bundler (#{Bundler::VERSION})").
           must_equal Bundler::VERSION
-      end.must_equal "Found bundler #{Bundler::VERSION}\n"
+      end.must_equal "Using installed bundler #{Bundler::VERSION}\n"
     end
 
     it "cannot find version that does not exist remotely" do
-      MatchingBundle.find_or_install_matching_version("bundler (12.13.14)").must_be_nil
+      capture_stderr do
+        MatchingBundle.find_or_install_matching_version("bundler (12.13.14)").must_be_nil
+      end.must_equal "No remote version of bundler satisfies 12.13.14\n"
     end
 
     it "installs missing remote version" do
