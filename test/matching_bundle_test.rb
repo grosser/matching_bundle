@@ -74,14 +74,9 @@ describe MatchingBundle do
       requirements(gemfile).must_equal ["~>1.0.1"]
     end
 
-    it "finds dependencies before other requirements" do
-      gemfile = "asd\n    bundler (~>1.0.1)\nDEPENDENCIES\n  bundler (= 1.1.rc)"
-      requirements(gemfile).must_equal ["= 1.1.rc"]
-    end
-
-    it "finds all dependencies" do
-      gemfile = "asd\n    bundler (~>1.0.1)\nDEPENDENCIES\n  bundler (= 1.1.rc)"
-      requirements(gemfile).must_equal ["= 1.1.rc"]
+    it "finds dependencies too" do
+      gemfile = "asd\n    bundler (~>1.0.1)\nDEPENDENCIES\n  bundler (= 1.1.0.rc)"
+      requirements(gemfile).must_equal ["~>1.0.1", "= 1.1.0.rc"]
     end
 
     it "can find from failed bundle lock input" do
@@ -112,6 +107,10 @@ describe MatchingBundle do
 
     it "finds complex" do
       MatchingBundle.send(:find_satisfied, ['>=0', '~>1.2.0', '<=3'], ["1.2.3", "1.3.4"]).must_equal "1.2.3"
+    end
+
+    it "sorts logically" do
+      MatchingBundle.send(:find_satisfied, ['>=0'], ["1.2.3", "1.20.3", "1.3.3"]).must_equal "1.20.3"
     end
   end
 

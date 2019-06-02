@@ -18,6 +18,9 @@ else
 end
 
 require 'matching_bundle'
+# require_relative '../lib/matching_bundle' # use this for local debugging
 if version = MatchingBundle.find_or_install_matching_version(content)
   exec "bundle", "_#{version}_", *ARGV
+else
+  exec "bundle", *ARGV
 end

@@ -34,9 +34,10 @@ module MatchingBundle
 
     def find_satisfied(requirements, versions)
       requirement = Gem::Requirement.new(*requirements)
-      versions.reverse.find do |version|
-        requirement.satisfied_by? Gem::Version.new(version)
+      version = versions.map { |v| Gem::Version.new(v) }.sort!.reverse!.find do |version|
+        requirement.satisfied_by? version
       end
+      version.to_s if version
     end
 
     def installed_bundler_versions
@@ -47,7 +48,6 @@ module MatchingBundle
 
     def bundler_requirements(gemfile_content)
       gemfile_content.
-        split("DEPENDENCIES").last.to_s.
         split("Current Bundler version").first.to_s.
         scan(/^\s*bundler \((.*)\)/).flatten.
         flat_map { |r| r.split(", ") }
