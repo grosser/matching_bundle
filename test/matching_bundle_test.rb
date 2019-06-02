@@ -79,6 +79,11 @@ describe MatchingBundle do
       requirements(gemfile).must_equal ["~>1.0.1", "= 1.1.0.rc"]
     end
 
+    it "translates BUNDLED_WITH" do
+      gemfile = "asd\n    bundler (~>1.0.1)\n\nBUNDLED WITH\n    1.2.3"
+      requirements(gemfile).must_equal ["~>1.0.1", ">= 1.2.3", "~> 1.2"]
+    end
+
     it "can find from failed bundle lock input" do
       input = <<-TXT.gsub(/^        /, "")
         Fetching gem metadata from https://rubygems.org/..........

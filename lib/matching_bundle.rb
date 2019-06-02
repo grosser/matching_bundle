@@ -47,10 +47,18 @@ module MatchingBundle
     end
 
     def bundler_requirements(gemfile_content)
-      gemfile_content.
-        split("Current Bundler version").first.to_s.
-        scan(/^\s*bundler \((.*)\)/).flatten.
-        flat_map { |r| r.split(", ") }
+      requirements =
+        gemfile_content.
+          split("Current Bundler version").first.to_s.
+          scan(/^\s*bundler \((.*)\)/).flatten.
+          flat_map { |r| r.split(", ") }
+
+      # needs to be >= to avoid warnings and the same major version to not fail
+      if gemfile_content =~ /BUNDLED WITH\n\s+(.*)/
+        requirements += [">= #{$1}", "~> #{$1[/\d+\.\d+/]}"]
+      end
+
+      requirements
     end
   end
 end
