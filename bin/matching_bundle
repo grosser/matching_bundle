@@ -20,7 +20,11 @@ end
 require 'matching_bundle'
 # require_relative '../lib/matching_bundle' # use this for local debugging
 if version = MatchingBundle.find_or_install_matching_version(content)
-  exec "bundle", "_#{version}_", *ARGV
-else
-  exec "bundle", *ARGV
+  # some gem/ruby combinations do not support `bundle _1.2.3_`
+  if system("bundle _#{version}_ --version &>/dev/null")
+    exec "bundle", "_#{version}_", *ARGV
+  else
+    warn "Unable to use _#{version}_, falling back to default version"
+  end
 end
+exec "bundle", *ARGV
