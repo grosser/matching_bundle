@@ -8,6 +8,12 @@ gem install matching_bundle
 matching_bundle exec rake
 ```
 
+```
+# .travis.yml
+install: gem i matching_bundle && matching_bundle install
+script: matching_bundle exec rake spec
+```
+
 Author
 ======
 [Michael Grosser](http://grosser.it)<br/>
