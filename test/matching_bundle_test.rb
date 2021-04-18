@@ -83,7 +83,7 @@ describe MatchingBundle do
 
     it "translates BUNDLED_WITH" do
       gemfile = "asd\n    bundler (~>1.0.1)\n\nBUNDLED WITH\n    1.2.3"
-      requirements(gemfile).must_equal ["~>1.0.1", ">= 1.2.3", "~> 1.2"]
+      requirements(gemfile).must_equal ["~>1.0.1", "= 1.2.3"]
     end
 
     it "can find from failed bundle lock input" do
@@ -123,7 +123,7 @@ describe MatchingBundle do
 
   describe ".installed_bundler_versions" do
     it "finds something" do
-      expected = `gem list bundler | grep bundler`.strip.match(/\((.*)\)/)[1].split(', ')
+      expected = `gem list bundler | grep bundler`.strip.match(/\((.*)\)/)[1].sub('default: ', '').split(', ')
       MatchingBundle.send(:installed_bundler_versions).must_equal expected
     end
   end

@@ -56,9 +56,9 @@ module MatchingBundle
           scan(/^\s*bundler \((.*)\)/).flatten.
           flat_map { |r| r.split(", ") }
 
-      # needs to be >= to avoid warnings and the same major version to not fail
+      # saw 2.2.16 fail on 2.2.3 ... so we need exact match
       if gemfile_content =~ /BUNDLED WITH\n\s+(.*)/
-        requirements += [">= #{$1}", "~> #{$1[/\d+\.\d+/]}"]
+        requirements << "= #{$1}"
       end
 
       requirements
